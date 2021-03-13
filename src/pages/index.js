@@ -8,10 +8,14 @@ import {
     Box,
     FormControl,
     FormLabel,
-    FormHelperText,
     Radio,
     RadioGroup,
     HStack,
+    Alert,
+    AlertDescription,
+    AlertIcon,
+    AlertTitle,
+    CloseButton,
 } from '@chakra-ui/react';
 import {ExternalLinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
 import {Container} from '../components/Container';
@@ -26,6 +30,7 @@ const Index = () => {
     const [amount, setAmount] = useState(1);
     const [range, setRange] = useState('week');
     const [fetching, setFetching] = useState(false);
+    const [error, setError] = useState(null);
     const [chartData, setChartData] = useState([]);
 
     const fetchData = async () => {
@@ -34,7 +39,7 @@ const Index = () => {
         let startDate = dayjs();
         switch (range) {
             case 'week':
-                startDate = startDate.subtract(7, 'days');
+                startDate = startDate.subtract(1, 'week');
                 break;
 
             case 'month':
@@ -53,20 +58,24 @@ const Index = () => {
                 break;
         }
 
-        try {
-            const res = await fetch(
-                `/api/data/?startDate=${startDate.format(
-                    'YYYY-MM-DD',
-                )}&endDate=${dayjs().format('YYYY-MM-DD')}&amount=${amount}`,
-            );
+        const res = await fetch(
+            `/api/data/?startDate=${startDate.format(
+                'YYYY-MM-DD',
+            )}&endDate=${dayjs().format('YYYY-MM-DD')}&amount=${amount}`,
+        );
 
+        try {
             const json = await res.json();
 
             let data = [['Date', 'Price'], ...json.data];
 
             setChartData(data);
+            setError(null);
         } catch (e) {
             console.error(e);
+            setFetching(false);
+            setError('Invalid Response Received');
+            return;
         }
 
         setFetching(false);
@@ -75,7 +84,6 @@ const Index = () => {
     /*
 
     - favicon and html <head> stuff
-    - error handling
     */
 
     return (
@@ -144,6 +152,19 @@ const Index = () => {
                             height="100%"
                             // legendToggle
                         />
+                    )}
+                    {error && (
+                        <Alert status="error">
+                            <AlertIcon />
+                            <AlertTitle mr={2}>An error occurred.</AlertTitle>
+                            <AlertDescription>{error}</AlertDescription>
+                            <CloseButton
+                                position="absolute"
+                                right="8px"
+                                top="8px"
+                                onClick={() => setError(null)}
+                            />
+                        </Alert>
                     )}
                 </Box>
             </Main>
