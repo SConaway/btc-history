@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Link, Text, Input, Button, Box} from '@chakra-ui/react';
+import {Link, Text, Input, IconButton, Box} from '@chakra-ui/react';
 import {ExternalLinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
 import {Container} from '../components/Container';
 import {Main} from '../components/Main';
@@ -48,9 +48,7 @@ const Index = () => {
     return (
         <Container minHeight="100vh">
             <Main>
-                <Text>
-                    Get started by entering the amount of BTC you wish to graph:
-                </Text>
+                <Text align="center">How much BTC do you have?</Text>
 
                 <Input
                     value={amount}
@@ -64,16 +62,15 @@ const Index = () => {
                     borderColor="gray.300"
                 />
 
-                <Button
-                    rightIcon={<ArrowForwardIcon />}
-                    colorScheme="teal"
+                <IconButton
                     variant="outline"
+                    colorScheme="teal"
+                    aria-label="Graph"
+                    icon={<ArrowForwardIcon />}
                     isLoading={fetching}
                     onClick={fetchData}
                     disabled={!amount || amount === '0'}
-                >
-                    Go!
-                </Button>
+                />
 
                 <Box height="70vh" width="100%">
                     {chartData.length > 0 && (
@@ -93,7 +90,7 @@ const Index = () => {
                                 legend: 'none',
                             }}
                             // width="100%"
-                            // height="100%"
+                            height="100%"
                             // legendToggle
                         />
                     )}

@@ -8,6 +8,7 @@ export const Main = (props) => (
         // mt="5vh"
         // py="8rem"
         px="1rem"
+        justify="center"
         {...props}
     />
 );
