@@ -1,7 +1,7 @@
 import {useState} from 'react';
 
-import {Link, Text, Input, Button} from '@chakra-ui/react';
-import {ExternalLinkIcon, LinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
+import {Link, Text, Input, Button, Box} from '@chakra-ui/react';
+import {ExternalLinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
 import {Container} from '../components/Container';
 import {Main} from '../components/Main';
 import {Footer} from '../components/Footer';
@@ -11,44 +11,42 @@ import {Chart} from 'react-google-charts';
 import dayjs from 'dayjs';
 
 const Index = () => {
-    const [amount, setAmount] = useState('');
+    const [amount, setAmount] = useState(1);
     const [fetching, setFetching] = useState(false);
-    const [data, setData] = useState([
-        ['Age', 'Weight'],
-        [3, 3.5],
-        [4, 5],
-        [6.5, 7],
-        [8, 12],
-        [11, 14],
-    ]);
+    const [chartData, setChartData] = useState([]);
 
     const fetchData = async () => {
-        // setFetching(true);
-        const startDate = new dayjs();
-        const today = new Date();
-        // try {
+        setFetching(true);
 
-        const res = await fetch(
-            `https://api.coindesk.com/v1/bpi/historical/close.json?start=${dayjs()
-                .subtract(7, 'days')
-                .format('YYYY-MM-DD')}&end=${dayjs().format('YYYY-MM-DD')}`,
-            {mode: 'no-cors'},
-        );
-        console.log(res);
+        const startDate = dayjs().subtract(7, 'days');
 
-        const json = await res.json();
-        console.log(json);
+        try {
+            const res = await fetch(
+                `/api/data/?startDate=${startDate.format(
+                    'YYYY-MM-DD',
+                )}&endDate=${dayjs().format('YYYY-MM-DD')}&amount=${amount}`,
+            );
 
-        // } catch (e) {
-        //     console.error(e);
-        // }
+            const json = await res.json();
 
-        // setFetching(false);
+            let data = [['Date', 'Price'], ...json.data];
+
+            setChartData(data);
+        } catch (e) {
+            console.error(e);
+        }
+
+        setFetching(false);
     };
 
+    /*
+
+    - picker (month, week, year, 10years)
+    - make chart fill parent (make container larger)
+    */
+
     return (
-        <Container height="100vh">
-            {/* <Hero /> */}
+        <Container minHeight="100vh">
             <Main>
                 <Text>
                     Get started by entering the amount of BTC you wish to graph:
@@ -59,6 +57,11 @@ const Index = () => {
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="BTC"
                     size="sm"
+                    variant="outline"
+                    isInvalid={!amount || amount === '0'}
+                    isRequired
+                    label="Amount of Bitcoin"
+                    borderColor="gray.300"
                 />
 
                 <Button
@@ -67,31 +70,39 @@ const Index = () => {
                     variant="outline"
                     isLoading={fetching}
                     onClick={fetchData}
+                    disabled={!amount || amount === '0'}
                 >
                     Go!
                 </Button>
 
-                <Chart
-                    chartType="AreaChart"
-                    data={data}
-                    options={{
-                        // title: 'Company Performance',
-                        hAxis: {title: 'Time', titleTextStyle: {color: '#333'}},
-                        // vAxis: {minValue: 0},
-                        // For the legend to fit, we make the chart area smaller
-                        chartArea: {width: '50%', height: '70%'},
-                        // lineWidth: 25
-                        backgroundColor: '',
-                        legend: 'none',
-                    }}
-                    // width="80%"
-                    // height="400px"
-                    // legendToggle
-                />
+                <Box height="70vh" width="100%">
+                    {chartData.length > 0 && (
+                        <Chart
+                            chartType="AreaChart"
+                            data={chartData}
+                            options={{
+                                // title: 'Company Performance',
+                                hAxis: {
+                                    title: 'Time',
+                                    titleTextStyle: {color: '#333'},
+                                },
+                                // vAxis: {minValue: 0},
+                                // For the legend to fit, we make the chart area smaller
+                                chartArea: {width: '50%', height: '70%'},
+                                // lineWidth: 25
+                                backgroundColor: '',
+                                legend: 'none',
+                            }}
+                            // width="100%"
+                            height="100%"
+                            // legendToggle
+                        />
+                    )}
+                </Box>
             </Main>
 
             <Footer>
-                <Text fontSize="xs" color="gray.500">
+                <Text fontSize="xs" color="gray.300">
                     Powered by{' '}
                     <Link
                         href="https://www.coindesk.com/price/bitcoin"

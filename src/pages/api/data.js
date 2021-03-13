@@ -12,7 +12,15 @@ export default async (req, res) => {
     const text = await response.text();
 
     try {
-        res.json(await response.json());
+        const responseJSON = JSON.parse(text);
+
+        let data = Object.entries(responseJSON.bpi)
+            .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+            .map(([key, value]) => [key, value * req.query.amount]);
+
+        let json = {...responseJSON, data};
+        delete json.bpi;
+        res.json(json);
     } catch (err) {
         res.status(response.status).send(text);
     }
