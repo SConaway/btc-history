@@ -64,7 +64,7 @@ const Index = () => {
 
                 <IconButton
                     variant="outline"
-                    colorScheme="teal"
+                    colorScheme="blue"
                     aria-label="Graph"
                     icon={<ArrowForwardIcon />}
                     isLoading={fetching}
