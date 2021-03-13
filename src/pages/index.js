@@ -87,14 +87,13 @@ const Index = () => {
                                     titleTextStyle: {color: '#333'},
                                 },
                                 // vAxis: {minValue: 0},
-                                // For the legend to fit, we make the chart area smaller
-                                chartArea: {width: '50%', height: '70%'},
+                                // chartArea: {width: '50%', height: '70%'},
                                 // lineWidth: 25
                                 backgroundColor: '',
                                 legend: 'none',
                             }}
                             // width="100%"
-                            height="100%"
+                            // height="100%"
                             // legendToggle
                         />
                     )}
