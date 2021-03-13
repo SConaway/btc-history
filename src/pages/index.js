@@ -1,6 +1,18 @@
 import {useState} from 'react';
 
-import {Link, Text, Input, IconButton, Box} from '@chakra-ui/react';
+import {
+    Link,
+    Text,
+    Input,
+    IconButton,
+    Box,
+    FormControl,
+    FormLabel,
+    FormHelperText,
+    Radio,
+    RadioGroup,
+    HStack,
+} from '@chakra-ui/react';
 import {ExternalLinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
 import {Container} from '../components/Container';
 import {Main} from '../components/Main';
@@ -12,13 +24,34 @@ import dayjs from 'dayjs';
 
 const Index = () => {
     const [amount, setAmount] = useState(1);
+    const [range, setRange] = useState('week');
     const [fetching, setFetching] = useState(false);
     const [chartData, setChartData] = useState([]);
 
     const fetchData = async () => {
         setFetching(true);
 
-        const startDate = dayjs().subtract(7, 'days');
+        let startDate = dayjs();
+        switch (range) {
+            case 'week':
+                startDate = startDate.subtract(7, 'days');
+                break;
+
+            case 'month':
+                startDate = startDate.subtract(1, 'month');
+                break;
+
+            case 'year':
+                startDate = startDate.subtract(1, 'year');
+                break;
+
+            case '10year':
+                startDate = startDate.subtract(10, 'year');
+                break;
+
+            default:
+                break;
+        }
 
         try {
             const res = await fetch(
@@ -41,26 +74,44 @@ const Index = () => {
 
     /*
 
-    - picker (month, week, year, 10years)
-    - make chart fill parent (make container larger)
+    - favicon and html <head> stuff
+    - error handling
     */
 
     return (
         <Container minHeight="100vh">
             <Main>
-                <Text align="center">How much BTC do you have?</Text>
+                <FormControl>
+                    <FormLabel htmlFor="amount" sx={{fontWeight: 'normal'}}>
+                        How much BTC do you have?
+                    </FormLabel>
+                    <Input
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="BTC"
+                        size="sm"
+                        variant="outline"
+                        isInvalid={!amount || amount === '0'}
+                        isRequired
+                        label="Amount of Bitcoin"
+                        borderColor="gray.300"
+                        id="amount"
+                    />
+                </FormControl>
 
-                <Input
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="BTC"
-                    size="sm"
-                    variant="outline"
-                    isInvalid={!amount || amount === '0'}
-                    isRequired
-                    label="Amount of Bitcoin"
-                    borderColor="gray.300"
-                />
+                <FormControl as="fieldset">
+                    <FormLabel as="legend" htmlFor="range">
+                        Range for chart
+                    </FormLabel>
+                    <RadioGroup value={range} onChange={setRange} id="range">
+                        <HStack spacing="24px">
+                            <Radio value="week">Last week</Radio>
+                            <Radio value="month">Last Month</Radio>
+                            <Radio value="year">Last Year</Radio>
+                            <Radio value="10year">Last 10 Years</Radio>
+                        </HStack>
+                    </RadioGroup>
+                </FormControl>
 
                 <IconButton
                     variant="outline"
