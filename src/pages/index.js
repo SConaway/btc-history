@@ -34,6 +34,8 @@ const Index = () => {
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState([]);
+    const [startPrice, setStartPrice] = useState(0);
+    const [endPrice, setEndPrice] = useState(0);
 
     const fetchData = async () => {
         setFetching(true);
@@ -71,6 +73,9 @@ const Index = () => {
 
             let data = [['Date', 'Price'], ...json.data];
 
+            setStartPrice(data[1][1]);
+            setEndPrice(data[data.length - 1][1]);
+
             setChartData(data);
             setError(null);
         } catch (e) {
@@ -82,7 +87,6 @@ const Index = () => {
 
         setFetching(false);
     };
-
 
     return (
         <>
@@ -139,25 +143,75 @@ const Index = () => {
 
                     <Box height="70vh" width="100%">
                         {chartData.length > 0 && (
-                            <Chart
-                                chartType="AreaChart"
-                                data={chartData}
-                                options={{
-                                    // title: 'Company Performance',
-                                    hAxis: {
-                                        title: 'Time',
-                                        titleTextStyle: {color: '#333'},
-                                    },
-                                    // vAxis: {minValue: 0},
-                                    // chartArea: {width: '50%', height: '70%'},
-                                    // lineWidth: 25
-                                    backgroundColor: '',
-                                    legend: 'none',
-                                }}
-                                // width="100%"
-                                height="100%"
-                                // legendToggle
-                            />
+                            <>
+                                <HStack
+                                    flexWrap="wrap"
+                                    align="center"
+                                    justifyContent="space-between"
+                                >
+                                    <Box textAlign="center">
+                                        <Text color="gray.500">Start:</Text>{' '}
+                                        <Text>
+                                            ${''}
+                                            {Math.round(startPrice * 100) / 100}
+                                        </Text>
+                                    </Box>
+                                    <Box textAlign="center">
+                                        <Text color="gray.500">End:</Text>{' '}
+                                        <Text>
+                                            ${''}
+                                            {Math.round(endPrice * 100) / 100}
+                                        </Text>
+                                    </Box>
+                                    <Box textAlign="center">
+                                        <Text
+                                            color={
+                                                endPrice - startPrice > 0
+                                                    ? 'gray.500'
+                                                    : endPrice - startPrice < 0
+                                                    ? 'red'
+                                                    : 'gray.500'
+                                            }
+                                        >
+                                            Difference:
+                                        </Text>{' '}
+                                        <Text
+                                            color={
+                                                endPrice - startPrice > 0
+                                                    ? 'green'
+                                                    : endPrice - startPrice < 0
+                                                    ? 'red'
+                                                    : ''
+                                            }
+                                        >
+                                            ${''}
+                                            {Math.round(
+                                                (endPrice - startPrice) * 100,
+                                            ) / 100}
+                                        </Text>
+                                    </Box>
+                                </HStack>
+                                <Chart
+                                    chartType="AreaChart"
+                                    data={chartData}
+                                    options={{
+                                        // title: 'Company Performance',
+                                        hAxis: {
+                                            title: 'Time',
+                                            titleTextStyle: {color: '#333'},
+                                        },
+                                        vAxis: {title: 'Value in Dollars'},
+                                        // chartArea: {width: '75%', height: '70%'},
+                                        // lineWidth: 25
+                                        backgroundColor: '',
+                                        legend: 'none',
+                                    }}
+                                    // width={`${window.width * 0.9}px`}
+                                    width="100%"
+                                    height="100%"
+                                    // legendToggle
+                                />
+                            </>
                         )}
                         {error && (
                             <Alert status="error">
