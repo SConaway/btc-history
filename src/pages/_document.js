@@ -4,9 +4,7 @@ export default class Document extends NextDocument {
     render() {
         return (
             <Html lang="en">
-                <Head>
-                    <title>Bitcoin Price History</title>
-                </Head>
+                <Head />
                 <body>
                     <Main />
                     <NextScript />
