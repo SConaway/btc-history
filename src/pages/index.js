@@ -150,32 +150,31 @@ const Index = () => {
                                     justifyContent="space-between"
                                 >
                                     <Box textAlign="center">
-                                        <Text color="gray.500">Start:</Text>{' '}
-                                        <Text>
-                                            ${''}
-                                            {Math.round(startPrice * 100) / 100}
-                                        </Text>
+                                        <Text color="gray.400">Start:</Text>
+                                        <HStack spacing={0}>
+                                            <Text fontWeight="light">$</Text>
+                                            <Text>
+                                                {Math.round(startPrice * 100) /
+                                                    100}
+                                            </Text>
+                                        </HStack>
                                     </Box>
                                     <Box textAlign="center">
-                                        <Text color="gray.500">End:</Text>{' '}
-                                        <Text>
-                                            ${''}
-                                            {Math.round(endPrice * 100) / 100}
-                                        </Text>
+                                        <Text color="gray.400">End:</Text>
+                                        <HStack spacing={0}>
+                                            <Text fontWeight="light">$</Text>
+                                            <Text>
+                                                {Math.round(endPrice * 100) /
+                                                    100}
+                                            </Text>
+                                        </HStack>
                                     </Box>
                                     <Box textAlign="center">
-                                        <Text
-                                            color={
-                                                endPrice - startPrice > 0
-                                                    ? 'gray.500'
-                                                    : endPrice - startPrice < 0
-                                                    ? 'red'
-                                                    : 'gray.500'
-                                            }
-                                        >
+                                        <Text color="gray.400">
                                             Difference:
                                         </Text>{' '}
-                                        <Text
+                                        <HStack
+                                            spacing={0}
                                             color={
                                                 endPrice - startPrice > 0
                                                     ? 'green'
@@ -184,11 +183,14 @@ const Index = () => {
                                                     : ''
                                             }
                                         >
-                                            ${''}
-                                            {Math.round(
-                                                (endPrice - startPrice) * 100,
-                                            ) / 100}
-                                        </Text>
+                                            <Text fontWeight="light">$</Text>
+                                            <Text>
+                                                {Math.round(
+                                                    (endPrice - startPrice) *
+                                                        100,
+                                                ) / 100}
+                                            </Text>
+                                        </HStack>
                                     </Box>
                                 </HStack>
                                 <Chart
