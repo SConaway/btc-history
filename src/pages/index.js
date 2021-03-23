@@ -83,10 +83,6 @@ const Index = () => {
         setFetching(false);
     };
 
-    /*
-
-    - favicon
-    */
 
     return (
         <>
