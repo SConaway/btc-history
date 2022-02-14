@@ -4,6 +4,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "analyze": "ANALYZE=true next build",
         "start": "next start",
         "pretty": "prettier --write '*/**/*.{js,json,ts,tsx}'"
     },
@@ -21,6 +22,7 @@
     },
     "license": "MIT",
     "devDependencies": {
+        "@next/bundle-analyzer": "^12.0.10",
         "prettier": "^2.2.1"
     }
 }
