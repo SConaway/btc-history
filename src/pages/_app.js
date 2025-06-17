@@ -1,10 +1,10 @@
-import {ChakraProvider} from '@chakra-ui/react';
+import {Provider} from '../components/ui/provider';
 
 function MyApp({Component, pageProps}) {
     return (
-        <ChakraProvider resetCSS>
+        <Provider resetCSS>
             <Component {...pageProps} />
-        </ChakraProvider>
+        </Provider>
     );
 }
 

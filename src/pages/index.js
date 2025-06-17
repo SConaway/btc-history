@@ -6,9 +6,8 @@ import {
     Input,
     IconButton,
     Box,
-    FormControl,
-    FormLabel,
-    Radio,
+    Field,
+    Icon,
     RadioGroup,
     HStack,
     Alert,
@@ -16,8 +15,9 @@ import {
     AlertIcon,
     AlertTitle,
     CloseButton,
+    VStack,
 } from '@chakra-ui/react';
-import {ExternalLinkIcon, ArrowForwardIcon} from '@chakra-ui/icons';
+import {SlArrowRight, SlShareAlt} from 'react-icons/sl';
 import {Container} from '../components/Container';
 import {Main} from '../components/Main';
 import {Footer} from '../components/Footer';
@@ -62,13 +62,16 @@ const Index = () => {
                 break;
         }
 
-        const res = await fetch(
-            `/api/data/?startDate=${startDate.format(
-                'YYYY-MM-DD',
-            )}&endDate=${dayjs().format('YYYY-MM-DD')}&amount=${amount}`,
-        );
-
         try {
+            // debugger;
+            const res = await fetch(
+                `/api/data/?startDate=${startDate.format(
+                    'YYYY-MM-DD',
+                )}&endDate=${dayjs().format('YYYY-MM-DD')}&amount=${amount}`,
+            );
+
+            if (!res.ok) throw await res.text();
+
             const json = await res.json();
 
             let data = [['Date', 'Price'], ...json.data];
@@ -79,10 +82,13 @@ const Index = () => {
             setChartData(data);
             setError(null);
         } catch (e) {
-            console.error(e);
-            setFetching(false);
-            setError('Invalid Response Received');
-            return;
+            if (e instanceof Error) {
+                console.error(e.message);
+                setError(e.message);
+            } else {
+                console.error(e);
+                setError(e);
+            }
         }
 
         setFetching(false);
@@ -95,51 +101,79 @@ const Index = () => {
             </Head>
             <Container minHeight="100vh">
                 <Main>
-                    <FormControl>
-                        <FormLabel htmlFor="amount" sx={{fontWeight: 'normal'}}>
+                    <Field.Root>
+                        <Field.Label
+                            htmlFor="amount"
+                            sx={{fontWeight: 'normal'}}
+                        >
                             How much BTC do you have?
-                        </FormLabel>
+                        </Field.Label>
                         <Input
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="BTC"
                             size="sm"
                             variant="outline"
-                            isInvalid={!amount || amount === '0'}
-                            isRequired
+                            required
+                            type="number"
                             label="Amount of Bitcoin"
                             borderColor="gray.300"
                             id="amount"
                         />
-                    </FormControl>
+                    </Field.Root>
 
-                    <FormControl as="fieldset">
-                        <FormLabel as="legend" htmlFor="range">
+                    <Field.Root as="fieldset">
+                        <Field.Label as="legend" htmlFor="range">
                             Range for chart
-                        </FormLabel>
-                        <RadioGroup
+                        </Field.Label>
+                        <RadioGroup.Root
                             value={range}
-                            onChange={setRange}
+                            onValueChange={(e) => setRange(e.value)}
                             id="range"
                         >
                             <HStack spacing="24px">
-                                <Radio value="week">Last week</Radio>
-                                <Radio value="month">Last Month</Radio>
-                                <Radio value="year">Last Year</Radio>
-                                <Radio value="10year">Last 10 Years</Radio>
+                                <RadioGroup.Item value="week">
+                                    <RadioGroup.ItemHiddenInput />
+                                    <RadioGroup.ItemIndicator />
+                                    <RadioGroup.ItemText>
+                                        Last week
+                                    </RadioGroup.ItemText>
+                                </RadioGroup.Item>
+                                <RadioGroup.Item value="month">
+                                    <RadioGroup.ItemHiddenInput />
+                                    <RadioGroup.ItemIndicator />
+                                    <RadioGroup.ItemText>
+                                        Last Month
+                                    </RadioGroup.ItemText>
+                                </RadioGroup.Item>
+                                <RadioGroup.Item value="year">
+                                    <RadioGroup.ItemHiddenInput />
+                                    <RadioGroup.ItemIndicator />
+                                    <RadioGroup.ItemText>
+                                        Last Year
+                                    </RadioGroup.ItemText>
+                                </RadioGroup.Item>
+                                <RadioGroup.Item value="10year">
+                                    <RadioGroup.ItemHiddenInput />
+                                    <RadioGroup.ItemIndicator />
+                                    <RadioGroup.ItemText>
+                                        Last 10 Years
+                                    </RadioGroup.ItemText>
+                                </RadioGroup.Item>
                             </HStack>
-                        </RadioGroup>
-                    </FormControl>
+                        </RadioGroup.Root>
+                    </Field.Root>
 
                     <IconButton
                         variant="outline"
-                        colorScheme="blue"
+                        color="black"
                         aria-label="Graph"
-                        icon={<ArrowForwardIcon />}
                         isLoading={fetching}
                         onClick={fetchData}
                         disabled={!amount || amount === '0'}
-                    />
+                    >
+                        <SlArrowRight />
+                    </IconButton>
 
                     <Box height="70vh" width="100%">
                         {chartData.length > 0 && (
@@ -179,8 +213,8 @@ const Index = () => {
                                                 endPrice - startPrice > 0
                                                     ? 'green'
                                                     : endPrice - startPrice < 0
-                                                    ? 'red'
-                                                    : ''
+                                                      ? 'red'
+                                                      : ''
                                             }
                                         >
                                             <Text fontWeight="light">$</Text>
@@ -216,34 +250,40 @@ const Index = () => {
                             </>
                         )}
                         {error && (
-                            <Alert status="error">
-                                <AlertIcon />
-                                <AlertTitle mr={2}>
-                                    An error occurred.
-                                </AlertTitle>
-                                <AlertDescription>{error}</AlertDescription>
+                            <Alert.Root status="error">
+                                <Alert.Indicator />
+                                <Alert.Content>
+                                    <Alert.Title mr={2}>
+                                        An error occurred:
+                                    </Alert.Title>
+                                    <Alert.Description>
+                                        {error}
+                                    </Alert.Description>
+                                </Alert.Content>
                                 <CloseButton
-                                    position="absolute"
-                                    right="8px"
-                                    top="8px"
                                     onClick={() => setError(null)}
+                                    pos="relative"
+                                    top="-2"
+                                    insetEnd="-2"
                                 />
-                            </Alert>
+                            </Alert.Root>
                         )}
                     </Box>
                 </Main>
 
                 <Footer>
-                    <Text fontSize="xs" color="gray.300">
-                        Powered by{' '}
-                        <Link
-                            href="https://www.coindesk.com/price/bitcoin"
-                            isExternal
-                        >
-                            Coindesk
-                            <ExternalLinkIcon mx="2px" />
-                        </Link>
-                    </Text>
+                    <Link
+                        href="https://www.coindesk.com/price/bitcoin"
+                        isExternal
+                        color="gray.400"
+                    >
+                        <HStack verticalAlign="baseline">
+                            <Text fontSize="xs">Powered by Coindesk </Text>
+                            {/* <Icon> */}
+                            <SlShareAlt size="12px" />
+                            {/* </Icon> */}
+                        </HStack>
+                    </Link>
                 </Footer>
             </Container>
         </>
